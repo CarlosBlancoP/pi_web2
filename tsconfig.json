@@ -16,7 +16,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "preserve", // 👈 CAMBIADO
     "incremental": true,
     "baseUrl": ".",
     "paths": {

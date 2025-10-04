@@ -19,7 +19,7 @@ const arteProductos = [
 export default function ArtesaniasPage() {
   return (
     <section className="p-8">
-      <h1 className="text-3xl font-bold mb-10 text-center">Arte</h1>
+      <h1 className="text-3xl font-bold mb-10 text-center">Artesanias</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-center">
         {arteProductos.map((producto) => (
           <Card key={producto.id}>
