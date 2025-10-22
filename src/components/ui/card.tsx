@@ -1,4 +1,3 @@
-// components/ui/card.tsx
 "use client";
 
 import * as React from "react";
@@ -19,7 +18,8 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        "w-80 bg-white rounded-xl border border-gray-200 shadow-sm transition transform hover:shadow-lg hover:scale-[1.02] overflow-hidden",
+        // 🔹 Hacemos la tarjeta responsive
+        "w-full max-w-xs bg-white rounded-xl border border-gray-200 shadow-sm transition transform hover:shadow-lg hover:scale-[1.02] overflow-hidden mx-auto",
         className
       )}
       {...props}
@@ -30,27 +30,41 @@ Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex flex-col items-center p-4 space-y-2", className)} {...props} />
+    <div
+      ref={ref}
+      className={cn("flex flex-col items-center p-4 space-y-2", className)}
+      {...props}
+    />
   )
 );
 CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref as any} className={cn("font-bold text-lg text-gray-800 text-center", className)} {...props} />
+    <h3
+      ref={ref as any}
+      className={cn("font-bold text-lg text-[#800020] text-center", className)}
+      {...props}
+    />
   )
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref as any} className={cn("text-sm text-gray-600 mt-2 text-center", className)} {...props} />
+    <p
+      ref={ref as any}
+      className={cn("text-sm text-gray-600 mt-2 text-center", className)}
+      {...props}
+    />
   )
 );
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("px-4 pb-4 text-center", className)} {...props} />
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("px-4 pb-4 text-center", className)} {...props} />
+  )
 );
 CardContent.displayName = "CardContent";
 
@@ -78,6 +92,7 @@ function ProductCard({
 
   return (
     <Card>
+      {/* Imagen del producto */}
       <div className="relative w-full h-48">
         <img
           src={producto.imagen}
@@ -90,14 +105,14 @@ function ProductCard({
       <CardHeader>
         <CardTitle>{producto.nombre}</CardTitle>
         <div className="flex items-center gap-2">
-          <span className="text-blue-600 font-semibold">${producto.precio}</span>
+          <span className="text-[#800020] font-semibold">${producto.precio}</span>
         </div>
       </CardHeader>
 
       <CardFooter>
         <button
           onClick={handleAdd}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-gradient-to-r from-[#800020] to-[#A42A5C] text-white py-2 rounded-lg hover:from-[#6B001A] hover:to-[#8C2A4C] transition"
         >
           Añadir al carrito
         </button>
@@ -105,7 +120,7 @@ function ProductCard({
         <button
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          className="mt-2 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
+          className="mt-2 flex items-center gap-2 text-sm text-gray-600 hover:text-[#800020]"
         >
           <span>{expanded ? "Ocultar" : "Ver más"}</span>
           <svg
@@ -133,7 +148,14 @@ function ProductCard({
   );
 }
 
-// Exportaciones nombradas
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, ProductCard };
-
-
+// ----------------- Exportaciones -----------------
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  ProductCard,
+  
+};

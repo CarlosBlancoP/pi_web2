@@ -3,13 +3,13 @@
 
 export default function Mapa() {
   return (
-    <div className="flex justify-center items-center py-10 px-4">
+    <div className="flex justify-center items-center py-10 px-4 mt-28">
        <div className="w-[80%] bg-white rounded-2xl shadow-xl overflow-hidden">
         
         {/* Encabezado */}
-        <div className="p-6 text-center border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <div className="p-6 text-center border-b border-gray-200 bg-gradient-to-r from-[#800020] to-[#A42A5C]">
           <h2 className="text-2xl md:text-3xl font-bold text-white drop-shadow-sm">
-            Nuestra Tienda Artesanal
+            Nuestra tienda fisica
           </h2>
           <p className="text-blue-100 mt-2 text-sm md:text-base">
             Cra. 49 #53 - 51, La Candelaria, Medellín, Antioquia
