@@ -1,7 +1,6 @@
 "use client"
-
 import { BestSellersCarousel } from "@/components/ui/best-sellers-carousel"
-import { CarouselDemo } from "./components/layouts/carousel"
+import { HeroCarousel } from "@/components/ui/hero-carousel"
 import { ProductCard } from "@/components/ui/card"
 import Mapa from "@/components/ui/Mapa"
 import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
@@ -58,7 +57,7 @@ const productos = [
   },
 ]
 
-// 🔹 Productos más vendidos
+// 🔹 Productos más vendidos (ficticios)
 const masVendidos = [
   {
     id: 101,
@@ -89,15 +88,14 @@ const masVendidos = [
 export default function Home() {
   return (
     <>
-      {/* 🛒 Drawer del carrito */}
       <div className="fixed top-4 right-4 z-50">
         <ShoppingCartDrawer />
       </div>
 
-      {/* 🖼️ Carrusel principal */}
-      <CarouselDemo />
+      {/* Carrusel */}
+      <HeroCarousel />
 
-      {/* 🆕 Nuevos productos */}
+      {/* Sección Nuevos productos */}
       <section className="p-8">
         <h1 className="text-3xl font-bold mb-10 text-center">Nuevos productos</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 justify-center">
@@ -107,13 +105,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 🏆 Más vendidos */}
-      <section className="p-8 bg-gray-50">
-        <h2 className="text-3xl font-bold mb-10 text-center">Más vendidos</h2>
-        <BestSellersCarousel products={masVendidos} /> {/* ✅ Prop correcto */}
-      </section>
+      {/* Sección Productos más vendidos */}
+      <BestSellersCarousel products={masVendidos} />
 
-      {/* 🗺️ Mapa */}
       <Mapa />
     </>
   )

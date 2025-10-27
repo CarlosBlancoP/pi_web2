@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import { ShoppingCart, Plus, Minus, Trash2, X, ShoppingBag } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -17,66 +17,26 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
-
-interface CartItem {
-  id: number
-  nombre: string
-  precio: number
-  cantidad: number
-  imagen: string
-  categoria?: string
-}
+import { useCart } from "@/contexts/cart-context"
 
 export function ShoppingCartDrawer() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      nombre: "Cuadro artesanal",
-      precio: 100,
-      cantidad: 2,
-      imagen: "/banner2.jpg",
-      categoria: "arte",
-    },
-    {
-      id: 2,
-      nombre: "Ambientador",
-      precio: 50,
-      cantidad: 1,
-      imagen: "/budaazul.jpg",
-      categoria: "perfume",
-    },
-    {
-      id: 101,
-      nombre: "Escultura de Buda",
-      precio: 200,
-      cantidad: 1,
-      imagen: "/3budas.jpg",
-      categoria: "arte",
-    },
-  ])
+  const router = useRouter()
+  const {
+    cartItems,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart: removeItem,
+    clearCart,
+    totalItems,
+    subtotal,
+    total,
+  } = useCart()
 
-  const increaseQuantity = (id: number) => {
-    setCartItems((items) => items.map((item) => (item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item)))
-  }
-
-  const decreaseQuantity = (id: number) => {
-    setCartItems((items) =>
-      items.map((item) => (item.id === id && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item)),
-    )
-  }
-
-  const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id))
-  }
-
-  const clearCart = () => {
-    setCartItems([])
-  }
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.cantidad, 0)
-  const subtotal = cartItems.reduce((sum, item) => sum + item.precio * item.cantidad, 0)
   const shipping = subtotal > 0 ? 15 : 0
-  const total = subtotal + shipping
+
+  const handleCheckout = () => {
+    router.push("/checkout")
+  }
 
   return (
     <Drawer direction="right">
@@ -87,11 +47,9 @@ export function ShoppingCartDrawer() {
           className="relative bg-[var(--cream)] border-[var(--burgundy)]/20 hover:bg-[var(--burgundy)]/10 hover:border-[var(--burgundy)] text-[var(--burgundy-dark)] transition-all duration-300"
         >
           <ShoppingCart className="h-5 w-5" />
-          {totalItems > 0 && (
-            <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-[var(--burgundy)] text-[var(--cream)] text-xs border-2 border-[var(--cream)]">
-              {totalItems}
-            </Badge>
-          )}
+          <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-[var(--burgundy)] text-[var(--cream)] text-xs border-2 border-[var(--cream)]">
+            {totalItems}
+          </Badge>
           <span className="sr-only">Abrir carrito</span>
         </Button>
       </DrawerTrigger>
@@ -251,6 +209,7 @@ export function ShoppingCartDrawer() {
               <DrawerFooter className="px-0 pt-0">
                 <Button
                   size="lg"
+                  onClick={handleCheckout}
                   className="w-full bg-[var(--burgundy)] hover:bg-[var(--burgundy-dark)] text-[var(--cream)] font-semibold text-lg h-12 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   Finalizar Compra
