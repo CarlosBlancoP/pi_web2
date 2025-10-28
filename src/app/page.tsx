@@ -1,9 +1,11 @@
 "use client"
+
+import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
+import { Button } from "@/components/ui/button"
 import { BestSellersCarousel } from "@/components/ui/best-sellers-carousel"
 import { HeroCarousel } from "@/components/ui/hero-carousel"
 import { ProductCard } from "@/components/ui/card"
 import Mapa from "@/components/ui/Mapa"
-import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
 
 // 🔹 Productos nuevos
 const productos = [
@@ -25,89 +27,68 @@ const productos = [
   },
   {
     id: 3,
-    nombre: "Cuadro artesanal",
+    nombre: "Escultura de Buda",
     categoria: "arte",
-    precio: 100,
-    imagen: "/banner2.jpg",
-    descripcion: "Obra artística hecha con técnicas tradicionales.",
-  },
-  {
-    id: 4,
-    nombre: "Ambientador",
-    categoria: "perfume",
-    precio: 50,
-    imagen: "/budaazul.jpg",
-    descripcion: "Perfuma y decora tus espacios con este ambientador artesanal.",
-  },
-  {
-    id: 5,
-    nombre: "Cuadro artesanal",
-    categoria: "arte",
-    precio: 100,
-    imagen: "/banner2.jpg",
-    descripcion: "Decoración perfecta para el hogar con estilo único.",
-  },
-  {
-    id: 6,
-    nombre: "Ambientador",
-    categoria: "perfume",
-    precio: 50,
-    imagen: "/budaazul.jpg",
-    descripcion: "Fragancia duradera hecha con aceites naturales.",
+    precio: 200,
+    imagen: "/3budas.jpg",
+    descripcion: "Una escultura artesanal en barro que representa serenidad y equilibrio.",
   },
 ]
 
-// 🔹 Productos más vendidos (ficticios)
+// 🔹 Productos más vendidos
 const masVendidos = [
   {
     id: 101,
-    nombre: "Escultura de Buda",
-    precio: 200,
-    imagen: "/3budas.jpg",
-    vendidos: 120,
-    descripcion: "Una escultura artesanal en barro que representa serenidad y equilibrio espiritual.",
-  },
-  {
-    id: 102,
     nombre: "Aretes Árboles",
     precio: 80,
     imagen: "/aretesarboles.jpg",
     vendidos: 95,
-    descripcion: "Aretes hechos a mano con diseño de árboles, un accesorio único y elegante.",
+    descripcion: "Aretes hechos a mano con diseño natural y elegante.",
   },
   {
-    id: 103,
+    id: 102,
     nombre: "Caballos pintados",
     precio: 150,
     imagen: "/caballos.jpg",
     vendidos: 60,
-    descripcion: "Obra pintada en óleo de caballos, llena de color y movimiento artístico.",
+    descripcion: "Obra pintada en óleo con estilo artesanal y colorido.",
+  },
+  {
+    id: 103,
+    nombre: "Escultura decorativa",
+    precio: 220,
+    imagen: "/escultura-buda.jpg",
+    vendidos: 85,
+    descripcion: "Figura artesanal que representa calma y equilibrio.",
   },
 ]
 
 export default function Home() {
   return (
     <>
-      <div className="fixed top-4 right-4 z-50">
-        <ShoppingCartDrawer />
-      </div>
+   
 
-      {/* Carrusel */}
+      {/* 🌀 Carrusel principal */}
       <HeroCarousel />
 
-      {/* Sección Nuevos productos */}
-      <section className="p-8">
-        <h1 className="text-3xl font-bold mb-10 text-center">Nuevos productos</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 justify-center">
-          {productos.map((producto) => (
-            <ProductCard key={producto.id} producto={producto} />
-          ))}
+      {/* 🆕 Sección Nuevos productos */}
+      <section className="py-16 bg-[var(--cream)]">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold text-center mb-12 text-[var(--burgundy)]">
+            Nuevos productos
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {productos.map((producto) => (
+              <ProductCard key={producto.id} producto={producto} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Sección Productos más vendidos */}
+      {/* ⭐ Más vendidos */}
       <BestSellersCarousel products={masVendidos} />
 
+      {/* 🗺️ Mapa / contacto */}
       <Mapa />
     </>
   )
