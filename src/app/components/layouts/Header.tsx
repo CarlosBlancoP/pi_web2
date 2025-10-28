@@ -1,110 +1,140 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Search, Menu, X } from "lucide-react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useUser, SignInButton, UserButton } from "@clerk/nextjs"
-import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
+import Link from "next/link";
+import { Search, Menu, X, User, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import DropdownCategorias from "../ui/CategoryDropdown";
+import { useCategorias } from "src/hooks/useCategorias";
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const { isSignedIn, user } = useUser()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const { categorias, cargando, error } = useCategorias();
+
+  // ✅ Cerrar el dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    // usamos 'click' en lugar de 'mousedown' para no interferir con el botón
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleDropdownToggle = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 🔹 Evita que el click se propague y cierre el menú
+    setIsDropdownOpen((prev) => !prev);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#8b2942] via-[rgb(223,125,148)] to-[#a71c3a] shadow-lg">
       <div className="max-w-7xl mx-auto">
-        {/* Top Bar */}
+        {/* 🔹 Top Bar */}
         <div className="flex items-center justify-between px-6 py-4">
-          {/* Logo + Brand */}
+          {/* Logo + Marca */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <img
                 src="/logoredondo.jpg"
-                alt="Logo Artesanías"
+                alt="Logo El Arte de Vivir"
                 className="h-14 w-14 object-contain transition-transform group-hover:scale-110 duration-300"
               />
               <div className="absolute inset-0 bg-white/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-2xl text-white tracking-tight">El Arte de Vivir</span>
-              <span className="text-xs text-white/80 font-light">Artesanías Exclusivas</span>
+              <span className="font-bold text-2xl text-white tracking-tight">
+                El Arte de Vivir
+              </span>
+              <span className="text-xs text-white/80 font-light">
+                Artesanías Exclusivas
+              </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
+          {/* 🔹 Navegación Desktop */}
+          <nav className="hidden md:flex items-center space-x-1 relative">
             <Link href="/">
-              <Button variant="ghost" className="text-white hover:bg-white/20 transition-all font-medium">
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/20 hover:text-white transition-all duration-300 font-medium"
+              >
                 Inicio
               </Button>
             </Link>
-            <Link href="/arte">
-              <Button variant="ghost" className="text-white hover:bg-white/20 transition-all font-medium">
-                Arte
+
+            {/* 🔹 Dropdown Productos */}
+            <div className="relative" ref={dropdownRef}>
+              <Button
+                ref={buttonRef}
+                variant="ghost"
+                onClick={handleDropdownToggle}
+                className="text-white hover:bg-white/20 hover:text-white transition-all duration-300 font-medium flex items-center"
+              >
+                Productos
+                <ChevronDown
+                  className={`ml-1 h-4 w-4 transition-transform duration-300 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
               </Button>
-            </Link>
-            <Link href="/perfumes">
-              <Button variant="ghost" className="text-white hover:bg-white/20 transition-all font-medium">
-                Perfumes
-              </Button>
-            </Link>
-            <Link href="/artesanias">
-              <Button variant="ghost" className="text-white hover:bg-white/20 transition-all font-medium">
-                Artesanías
+
+              {isDropdownOpen && (
+                <DropdownCategorias
+                  categorias={categorias}
+                  cargando={cargando}
+                  error={error}
+                  visible={isDropdownOpen}
+                  setVisible={setIsDropdownOpen}
+                />
+              )}
+            </div>
+
+            <Link href="/visitanos">
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-white/20 hover:text-white transition-all duration-300 font-medium"
+              >
+                Visítanos
               </Button>
             </Link>
           </nav>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-3">
-            {/* Search */}
+          {/* 🔹 Botones derecha */}
+          <div className="flex items-center space-x-2">
+            {/* Búsqueda */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="text-white hover:bg-white/20 transition-all hidden md:flex"
+              className="text-white hover:bg-white/20 transition-all duration-300 hidden md:flex"
             >
               <Search className="h-5 w-5" />
             </Button>
 
-            {/* Shopping Cart */}
-            <div className="relative">
-              <ShoppingCartDrawer />
-            </div>
+            {/* Iniciar sesión */}
+            <Link href="/login" className="hidden md:block">
+              <Button className="bg-white text-[#8b2942] hover:bg-white/90 font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
+                <User className="h-4 w-4 mr-2" />
+                Iniciar sesión
+              </Button>
+            </Link>
 
-            {/* Clerk Auth */}
-            {isSignedIn ? (
-              <div className="flex items-center space-x-3">
-                <span className="hidden sm:inline text-sm text-white/90">
-                  Hola,{" "}
-                  <span className="font-semibold text-white">
-                    {user?.firstName || user?.username}
-                  </span>
-                </span>
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-10 h-10 border-2 border-white",
-                      userButtonPopoverCard: "shadow-xl",
-                      userButtonPopoverActionButton: "hover:bg-[#fbe9ec]",
-                      userButtonPopoverActionButtonText: "text-gray-700",
-                      userButtonPopoverFooter: "hidden",
-                    },
-                  }}
-                  afterSignOutUrl="/"
-                />
-              </div>
-            ) : (
-              <SignInButton mode="modal">
-                <Button className="bg-white text-[#8b2942] hover:bg-white/90 font-semibold shadow-md hover:shadow-lg">
-                  Iniciar sesión
-                </Button>
-              </SignInButton>
-            )}
-
-            {/* Mobile Menu Button */}
+            {/* Menú móvil */}
             <Button
               variant="ghost"
               size="icon"
@@ -116,14 +146,14 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* 🔹 Barra de búsqueda */}
         {isSearchOpen && (
           <div className="px-6 pb-4 animate-in slide-in-from-top duration-300">
             <div className="relative max-w-2xl mx-auto">
               <input
                 type="text"
                 placeholder="Buscar productos..."
-                className="w-full px-4 py-3 pl-12 rounded-lg bg-white/95 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
+                className="w-full px-4 py-3 pl-12 rounded-lg bg-white/95 backdrop-blur-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
                 autoFocus
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -131,52 +161,78 @@ export default function Header() {
           </div>
         )}
 
-        {/* Mobile Menu */}
+        {/* 🔹 Menú móvil */}
         {isMenuOpen && (
           <div className="md:hidden px-6 pb-4 space-y-2 animate-in slide-in-from-top duration-300">
             <Link href="/" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:bg-white/20 font-medium"
+              >
                 Inicio
               </Button>
             </Link>
-            <Link href="/arte" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
-                Arte
-              </Button>
-            </Link>
-            <Link href="/perfumes" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
-                Perfumes
-              </Button>
-            </Link>
-            <Link href="/artesanias" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
-                Artesanías
-              </Button>
-            </Link>
 
-            {/* Carrito visible también en el menú móvil */}
-            <div className="pt-3 border-t border-white/20">
-              <ShoppingCartDrawer />
+            {/* Productos (versión móvil) */}
+            <div className="w-full">
+              <Button
+                variant="ghost"
+                className="w-full justify-between text-white hover:bg-white/20 font-medium"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                Productos
+                <ChevronDown
+                  className={`ml-2 h-4 w-4 transition-transform ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </Button>
+
+              {isDropdownOpen && (
+                <div className="pl-4">
+                  {cargando ? (
+                    <p className="text-white/80 text-sm">Cargando...</p>
+                  ) : (
+                    categorias.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        href={`/productos/${cat.id}`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-white/90 hover:bg-white/20 text-sm"
+                        >
+                          {cat.name}
+                        </Button>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
 
+            <Link href="/visitanos" onClick={() => setIsMenuOpen(false)}>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-white hover:bg-white/20 font-medium"
+              >
+                Visítanos
+              </Button>
+            </Link>
+
+            {/* Login móvil */}
             <div className="pt-2 border-t border-white/20">
-              {isSignedIn ? (
-                <div className="flex justify-between items-center text-white">
-                  <span>Hola, {user?.firstName || user?.username}</span>
-                  <UserButton afterSignOutUrl="/" />
-                </div>
-              ) : (
-                <SignInButton mode="modal">
-                  <Button className="w-full bg-white text-[#8b2942] hover:bg-white/90 font-semibold">
-                    Iniciar sesión
-                  </Button>
-                </SignInButton>
-              )}
+              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <Button className="w-full bg-white text-[#8b2942] hover:bg-white/90 font-semibold">
+                  <User className="h-4 w-4 mr-2" />
+                  Iniciar sesión
+                </Button>
+              </Link>
             </div>
           </div>
         )}
       </div>
     </header>
-  )
+  );
 }

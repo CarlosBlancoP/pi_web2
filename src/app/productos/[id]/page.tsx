@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation"
-import { ProductDetailClient } from "@/components/ui/product-detail-client"
+import { notFound } from "next/navigation";
+import { ProductDetailClient } from "@/components/ui/product-detail-client";
 
 // Datos de productos (en producción vendrían de una base de datos)
 const allProducts = [
@@ -185,21 +185,13 @@ const allProducts = [
   },
 ]
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const id = Number(params.id)
+export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ Desempaqueta el Promise
+  const product = allProducts.find((p) => p.id === Number(id));
 
-  // 🔎 Validar que sea un número válido
-  if (isNaN(id)) {
-    notFound()
-  }
-
-  const product = allProducts.find((p) => p.id === id)
-
-  // ⚠️ Si no se encuentra el producto, mostrar 404
   if (!product) {
-    notFound()
+    notFound();
   }
 
-  return <ProductDetailClient product={product} />
+  return <ProductDetailClient product={product} />;
 }
-
