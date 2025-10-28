@@ -2,26 +2,27 @@
 
 import Link from "next/link";
 import { Search, Menu, X, User, ChevronDown } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import DropdownCategorias from "../ui/CategoryDropdown";
 import { useCategorias } from "src/hooks/useCategorias";
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
+import { ShoppingCartDrawer } from "@/components/ui/shopping-cart";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
   const { categorias, cargando, error } = useCategorias();
   const { isSignedIn, user } = useUser();
 
-  // Cerrar el dropdown si se hace click fuera
+  // 🔹 Cierra dropdown al hacer clic fuera
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as Node;
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(target) &&
@@ -30,13 +31,14 @@ export default function Header() {
       ) {
         setIsDropdownOpen(false);
       }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    }
+    document.addEventListener("click", handleClickOutside, true);
+    return () => document.removeEventListener("click", handleClickOutside, true);
   }, []);
 
-  const handleDropdownToggle = (e: React.MouseEvent) => {
+  // 🔹 Alternar dropdown
+  const toggleDropdown = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     setIsDropdownOpen((prev) => !prev);
   };
@@ -44,9 +46,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#8b2942] via-[rgb(223,125,148)] to-[#a71c3a] shadow-lg">
       <div className="max-w-7xl mx-auto">
-        {/* 🔹 Top Bar */}
+        {/* 🔸 BARRA SUPERIOR */}
         <div className="flex items-center justify-between px-6 py-4">
-          {/* Logo */}
+          {/* LOGO */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <img
@@ -66,7 +68,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* 🔹 Navegación Desktop */}
+          {/* 🔸 NAV DESKTOP */}
           <nav className="hidden md:flex items-center space-x-1 relative">
             <Link href="/">
               <Button
@@ -77,12 +79,12 @@ export default function Header() {
               </Button>
             </Link>
 
-            {/* Dropdown Productos */}
+            {/* 🔸 DROPDOWN PRODUCTOS */}
             <div className="relative" ref={dropdownRef}>
               <Button
                 ref={buttonRef}
                 variant="ghost"
-                onClick={handleDropdownToggle}
+                onClick={toggleDropdown}
                 className="text-white hover:bg-white/20 font-medium flex items-center"
               >
                 Productos
@@ -98,8 +100,7 @@ export default function Header() {
                   categorias={categorias}
                   cargando={cargando}
                   error={error}
-                  visible={isDropdownOpen}
-                  setVisible={setIsDropdownOpen}
+                  onClose={() => setIsDropdownOpen(false)}
                 />
               )}
             </div>
@@ -114,9 +115,9 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* 🔹 Botones derecha */}
+          {/* 🔸 ACCIONES DERECHA */}
           <div className="flex items-center space-x-3">
-            {/* Búsqueda */}
+            {/* 🔹 BUSCAR */}
             <Button
               variant="ghost"
               size="icon"
@@ -126,7 +127,12 @@ export default function Header() {
               <Search className="h-5 w-5" />
             </Button>
 
-            {/* Clerk Auth */}
+            {/* 🔹 CARRITO */}
+            <div className="relative hidden md:block">
+              <ShoppingCartDrawer />
+            </div>
+
+            {/* 🔹 AUTH */}
             {isSignedIn ? (
               <div className="flex items-center space-x-2">
                 <span className="hidden sm:inline text-sm text-white/90">
@@ -153,7 +159,7 @@ export default function Header() {
               </SignInButton>
             )}
 
-            {/* Menú móvil */}
+            {/* 🔹 MENÚ MÓVIL */}
             <Button
               variant="ghost"
               size="icon"
@@ -165,7 +171,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* 🔹 Barra de búsqueda */}
+        {/* 🔸 BARRA DE BÚSQUEDA */}
         {isSearchOpen && (
           <div className="px-6 pb-4 animate-in slide-in-from-top duration-300">
             <div className="relative max-w-2xl mx-auto">
@@ -176,6 +182,67 @@ export default function Header() {
                 autoFocus
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+        )}
+
+        {/* 🔸 MENÚ MÓVIL */}
+        {isMenuOpen && (
+          <div className="md:hidden px-6 pb-4 space-y-2 animate-in slide-in-from-top duration-300">
+            <Link href="/" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
+                Inicio
+              </Button>
+            </Link>
+
+            {/* Dropdown en móvil */}
+            <div>
+              <Button
+                onClick={toggleDropdown}
+                className="w-full justify-start text-white hover:bg-white/20 font-medium flex items-center"
+              >
+                Productos
+                <ChevronDown
+                  className={`ml-2 h-4 w-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </Button>
+              {isDropdownOpen && (
+                <div className="ml-4">
+                  <DropdownCategorias
+                    categorias={categorias}
+                    cargando={cargando}
+                    error={error}
+                    onClose={() => setIsDropdownOpen(false)}
+                  />
+                </div>
+              )}
+            </div>
+
+            <Link href="/visitanos" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start text-white hover:bg-white/20 font-medium">
+                Visítanos
+              </Button>
+            </Link>
+
+            {/* 🔹 CARRITO EN MENÚ MÓVIL */}
+            <div className="pt-3 border-t border-white/20">
+              <ShoppingCartDrawer />
+            </div>
+
+            {/* 🔹 AUTH EN MÓVIL */}
+            <div className="pt-2 border-t border-white/20">
+              {isSignedIn ? (
+                <div className="flex justify-between items-center text-white">
+                  <span>Hola, {user?.firstName || user?.username}</span>
+                  <UserButton afterSignOutUrl="/" />
+                </div>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button className="w-full bg-white text-[#8b2942] hover:bg-white/90 font-semibold">
+                    Iniciar sesión
+                  </Button>
+                </SignInButton>
+              )}
             </div>
           </div>
         )}
