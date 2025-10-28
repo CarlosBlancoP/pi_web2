@@ -1,21 +1,23 @@
-"use client";
+"use client"
 
-import React from "react";
-import { ShoppingCartDrawer } from "@/components/ui/shopping-cart";
-import { ChatWidget } from "@/components/ui/chat-widget";
+import { ReactNode } from "react"
+import { CartProvider } from "@/contexts/cart-context"
+import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
+import { ChatWidget } from "@/components/ui/chat-widget"
 
-export function ClientProviders({ children }: { children: React.ReactNode }) {
+export function ClientProviders({ children }: { children: ReactNode }) {
   return (
-    <>
-      {/* ✅ Elementos interactivos del lado del cliente */}
+    <CartProvider>
+      {/* ✅ Carrito flotante disponible en todas las páginas */}
       <div className="fixed top-4 right-4 z-50">
         <ShoppingCartDrawer />
       </div>
 
-      <ChatWidget />
+      {/* ✅ Contenido dinámico (cada página) */}
+      {children}
 
-      {/* Contenido de la página */}
-      <main className="grow">{children}</main>
-    </>
-  );
+      {/* ✅ Chatbot visible en todas las páginas */}
+      <ChatWidget />
+    </CartProvider>
+  )
 }

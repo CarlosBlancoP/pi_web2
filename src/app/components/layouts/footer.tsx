@@ -1,10 +1,14 @@
+"use client"
+
 import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp } from "react-icons/fa"
 import { Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
-// Replaced custom Input import with native input element to avoid missing module
 import { Button } from "@/components/ui/button"
+import { useUser, SignInButton, UserButton } from "@clerk/nextjs"
 
 export default function Footer() {
+  const { isSignedIn, user } = useUser()
+
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-gray-900 to-[#4a1a1a] text-white mt-16">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -47,6 +51,35 @@ export default function Footer() {
               >
                 <FaWhatsapp size={20} />
               </Link>
+            </div>
+
+            {/* Clerk Auth (footer compacto) */}
+            <div className="pt-4 border-t border-gray-800 mt-4">
+              {isSignedIn ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">
+                    Hola, <span className="text-white font-semibold">{user?.firstName || user?.username}</span>
+                  </span>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8 border border-[#8b2942]",
+                        userButtonPopoverCard: "shadow-lg",
+                        userButtonPopoverActionButton: "hover:bg-[#fbe9ec]",
+                        userButtonPopoverActionButtonText: "text-gray-700",
+                        userButtonPopoverFooter: "hidden",
+                      },
+                    }}
+                    afterSignOutUrl="/"
+                  />
+                </div>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button className="w-full mt-2 bg-[#8b2942] hover:bg-[#6d1f34] text-white text-sm">
+                    Iniciar sesión
+                  </Button>
+                </SignInButton>
+              )}
             </div>
           </div>
 
@@ -146,7 +179,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <MapPin size={16} className="text-[#c44569]" />
-                <span>Medellin, Colombia</span>
+                <span>Medellín, Colombia</span>
               </div>
             </div>
           </div>
@@ -158,7 +191,7 @@ export default function Footer() {
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400 text-center md:text-left">
-            © 2025 El Arte de Vivir. Todos los derechos reservados.
+            © {new Date().getFullYear()} El Arte de Vivir. Todos los derechos reservados.
           </p>
           <div className="flex gap-6 text-sm text-gray-400">
             <Link href="/privacidad" className="hover:text-white transition-colors">
@@ -176,4 +209,3 @@ export default function Footer() {
     </footer>
   )
 }
-
