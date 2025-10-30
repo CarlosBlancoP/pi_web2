@@ -1,50 +1,67 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ChevronLeft, ChevronRight, Heart, Share2, ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useCart } from "@/contexts/cart-context"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Share2,
+  ShoppingCart,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/cart-context";
+import { useProductos } from "@/hooks/useProductos";
+import { useProductDetails } from "@/hooks/useProductDetails";
+import { Producto } from "@/types/Producto";
+import { ProductDetail } from "@/types/ProductDetail";
 
-interface ProductDetails {
-  origen: string
-  tipoArtesania: string
-  oficio: string
-  materiaPrima: string
-  etnia: string
-  programa: string
-}
+export default function ProductDetailClient() {
+  const params = useParams();
+  const productId = Number(params?.id);
+  const { productos, loading: loadingProductos } = useProductos();
+  const { details, loading: loadingDetalles } = useProductDetails(productId);
+  const [product, setProduct] = useState<Producto | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-interface Product {
-  id: number
-  nombre: string
-  categoria: string
-  precio: number
-  imagen: string
-  descripcion: string
-  detalles: ProductDetails
-  sku: string
-  disponible: boolean
-  descripcionDetallada: string
-}
+  useEffect(() => {
+    if (productos.length > 0) {
+      const found = productos.find((p) => p.id === productId);
+      setProduct(found || null);
+    }
+  }, [productos, productId]);
 
-export function ProductDetailClient({ product }: { product: Product }) {
-  const [quantity, setQuantity] = useState(1)
-  const { addToCart } = useCart()
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  if (loadingProductos || loadingDetalles) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-600">Cargando producto...</p>
+      </div>
+    );
+  }
+
+  if (!product || !details) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-600">Producto no encontrado.</p>
+      </div>
+    );
+  }
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart({
         id: product.id,
-        nombre: product.nombre,
-        precio: product.precio,
-        imagen: product.imagen,
-        descripcion: product.descripcion,
-        categoria: product.categoria,
-      })
+        nombre: product.name,
+        precio: product.price,
+        imagen: product.imageUrl,
+        descripcion: product.description,
+        categoria: product.categoryId.toString(),
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--cream)] to-white">
@@ -60,11 +77,9 @@ export function ProductDetailClient({ product }: { product: Product }) {
               Catálogo
             </Link>
             <span>/</span>
-            <Link href="/" className="hover:text-[var(--burgundy)] transition-colors capitalize">
-              {product.categoria}
-            </Link>
-            <span>/</span>
-            <span className="text-[var(--burgundy)] font-medium">{product.nombre}</span>
+            <span className="text-[var(--burgundy)] font-medium">
+              {product.name}
+            </span>
           </nav>
         </div>
       </div>
@@ -85,13 +100,16 @@ export function ProductDetailClient({ product }: { product: Product }) {
           <div className="space-y-4">
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-lg">
               <img
-                src={product.imagen || "/placeholder.svg"}
-                alt={product.nombre}
+                src={product.imageUrl || "/placeholder.svg"}
+                alt={product.name}
                 className="w-full h-full object-cover"
               />
-              {/* Share buttons */}
               <div className="absolute top-4 left-4 flex gap-2">
-                <Button variant="secondary" size="icon" className="bg-white/90 hover:bg-white rounded-full shadow-md">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="bg-white/90 hover:bg-white rounded-full shadow-md"
+                >
                   <Share2 className="h-4 w-4 text-[var(--burgundy)]" />
                 </Button>
               </div>
@@ -100,58 +118,37 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
           {/* Product Info Section */}
           <div className="space-y-6">
-            {/* Badge */}
-            {product.disponible && (
-              <div className="inline-block">
-                <span className="bg-green-100 text-green-800 text-xs font-medium px-3 py-1 rounded-full">
-                  Disponible
-                </span>
-              </div>
-            )}
-
             {/* Title */}
             <div>
-              <h1 className="text-4xl md:text-5xl font-serif text-[var(--burgundy-dark)] mb-2">{product.nombre}</h1>
+              <h1 className="text-4xl md:text-5xl font-serif text-[var(--burgundy-dark)] mb-2">
+                {product.name}
+              </h1>
               <p className="text-sm text-gray-600">
-                Referencia: <span className="font-medium">{product.sku}</span>
+                Referencia: <span className="font-medium">{details.sku}</span>
               </p>
             </div>
 
             {/* Price */}
             <div className="py-4 border-y border-gray-200">
-              <p className="text-4xl font-bold text-[var(--burgundy-dark)]">${product.precio.toLocaleString()}</p>
+              <p className="text-4xl font-bold text-[var(--burgundy-dark)]">
+                ${product.price.toLocaleString()}
+              </p>
             </div>
 
             {/* Description */}
-            <p className="text-gray-700 leading-relaxed">{product.descripcion}</p>
+            <p className="text-gray-700 leading-relaxed">
+              {product.description}
+            </p>
 
             {/* Details Table */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Origen</p>
-                  <p className="text-gray-700">{product.detalles.origen}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Tipo Artesanía</p>
-                  <p className="text-gray-700">{product.detalles.tipoArtesania}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Oficio</p>
-                  <p className="text-gray-700">{product.detalles.oficio}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Materia prima</p>
-                  <p className="text-gray-700">{product.detalles.materiaPrima}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Etnia/Comunidad</p>
-                  <p className="text-gray-700">{product.detalles.etnia}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[var(--burgundy)] mb-1">Programa / Colección</p>
-                  <p className="text-gray-700">{product.detalles.programa}</p>
-                </div>
+                <DetailItem label="Origen" value={details.origen} />
+                <DetailItem label="Tipo Artesanía" value={details.tipoArtesania} />
+                <DetailItem label="Oficio" value={details.oficio} />
+                <DetailItem label="Materia prima" value={details.materiaPrima} />
+                <DetailItem label="Etnia/Comunidad" value={details.etnia} />
+                <DetailItem label="Programa / Colección" value={details.programa} />
               </div>
             </div>
 
@@ -166,7 +163,9 @@ export function ProductDetailClient({ product }: { product: Product }) {
                   >
                     -
                   </button>
-                  <span className="px-6 py-2 border-x border-gray-300 font-medium">{quantity}</span>
+                  <span className="px-6 py-2 border-x border-gray-300 font-medium">
+                    {quantity}
+                  </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="px-4 py-2 hover:bg-gray-100 transition-colors"
@@ -199,15 +198,18 @@ export function ProductDetailClient({ product }: { product: Product }) {
               </div>
             </div>
 
-            {/* Additional Info */}
+            {/* SKU & Category */}
             <div className="text-sm text-gray-600 space-y-1">
               <p>
-                <span className="font-medium">SKU:</span> {product.sku}
+                <span className="font-medium">SKU:</span> {details.sku}
               </p>
               <p>
                 <span className="font-medium">Categoría:</span>{" "}
-                <Link href="/" className="text-[var(--burgundy)] hover:underline capitalize">
-                  {product.categoria}
+                <Link
+                  href="/"
+                  className="text-[var(--burgundy)] hover:underline capitalize"
+                >
+                  {product.categoryId}
                 </Link>
               </p>
             </div>
@@ -216,12 +218,25 @@ export function ProductDetailClient({ product }: { product: Product }) {
 
         {/* Description Section */}
         <div className="mt-16 max-w-4xl">
-          <h2 className="text-3xl font-serif text-[var(--burgundy-dark)] mb-6">Descripción</h2>
+          <h2 className="text-3xl font-serif text-[var(--burgundy-dark)] mb-6">
+            Descripción
+          </h2>
           <div className="prose prose-lg max-w-none">
-            <p className="text-gray-700 leading-relaxed">{product.descripcionDetallada}</p>
+            <p className="text-gray-700 leading-relaxed">
+              {details.descripcionDetallada}
+            </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+function DetailItem({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <p className="font-semibold text-[var(--burgundy)] mb-1">{label}</p>
+      <p className="text-gray-700">{value || "—"}</p>
+    </div>
+  );
 }

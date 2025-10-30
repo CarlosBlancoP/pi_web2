@@ -1,73 +1,44 @@
-"use client"
+"use client";
 
-import { ShoppingCartDrawer } from "@/components/ui/shopping-cart"
-import { Button } from "@/components/ui/button"
-import { BestSellersCarousel } from "@/components/ui/best-sellers-carousel"
-import { HeroCarousel } from "@/components/ui/hero-carousel"
-import { ProductCard } from "@/components/ui/card"
-import Mapa from "@/components/ui/Mapa"
-
-// 🔹 Productos nuevos
-const productos = [
-  {
-    id: 1,
-    nombre: "Cuadro artesanal",
-    categoria: "arte",
-    precio: 100,
-    imagen: "/banner2.jpg",
-    descripcion: "Un cuadro artesanal único con detalles pintados a mano.",
-  },
-  {
-    id: 2,
-    nombre: "Ambientador",
-    categoria: "perfume",
-    precio: 50,
-    imagen: "/budaazul.jpg",
-    descripcion: "Ambientador natural con fragancia relajante.",
-  },
-  {
-    id: 3,
-    nombre: "Escultura de Buda",
-    categoria: "arte",
-    precio: 200,
-    imagen: "/3budas.jpg",
-    descripcion: "Una escultura artesanal en barro que representa serenidad y equilibrio.",
-  },
-]
-
-// 🔹 Productos más vendidos
-const masVendidos = [
-  {
-    id: 101,
-    nombre: "Aretes Árboles",
-    precio: 80,
-    imagen: "/aretesarboles.jpg",
-    vendidos: 95,
-    descripcion: "Aretes hechos a mano con diseño natural y elegante.",
-  },
-  {
-    id: 102,
-    nombre: "Caballos pintados",
-    precio: 150,
-    imagen: "/caballos.jpg",
-    vendidos: 60,
-    descripcion: "Obra pintada en óleo con estilo artesanal y colorido.",
-  },
-  {
-    id: 103,
-    nombre: "Escultura decorativa",
-    precio: 220,
-    imagen: "/escultura-buda.jpg",
-    vendidos: 85,
-    descripcion: "Figura artesanal que representa calma y equilibrio.",
-  },
-]
+import { ShoppingCartDrawer } from "@/components/ui/shopping-cart";
+import { BestSellersCarousel } from "@/components/ui/best-sellers-carousel";
+import { HeroCarousel } from "@/components/ui/hero-carousel";
+import { ProductCard } from "@/components/ui/card";
+import Mapa from "@/components/ui/Mapa";
+import { useProductos } from "@/hooks/useProductos";
+import { Producto } from "@/types/Producto";
 
 export default function Home() {
+  const { productos, loading } = useProductos();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-lg text-gray-600">
+        Cargando productos...
+      </div>
+    );
+  }
+
+  // 🔹 Adaptar productos del backend al formato del frontend
+  const adaptados = productos.map((p: Producto) => ({
+    id: p.id,
+    nombre: p.name,
+    categoria: p.categoryId?.toString() || "General",
+    precio: p.price,
+    imagen: p.imageUrl,
+    descripcion: p.description,
+  }));
+
+  // 🔹 Últimos 3 productos agregados
+  const nuevosProductos = [...adaptados].sort((a, b) => b.id - a.id).slice(0, 3);
+
+  // 🔹 Más vendidos (por ahora aleatorios, 6 productos)
+  const masVendidos = [...adaptados]
+    .sort(() => Math.random() - 0.5) // mezcla los productos
+    .slice(0, 6);
+
   return (
     <>
-   
-
       {/* 🌀 Carrusel principal */}
       <HeroCarousel />
 
@@ -78,7 +49,7 @@ export default function Home() {
             Nuevos productos
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-            {productos.map((producto) => (
+            {nuevosProductos.map((producto) => (
               <ProductCard key={producto.id} producto={producto} />
             ))}
           </div>
@@ -91,5 +62,5 @@ export default function Home() {
       {/* 🗺️ Mapa / contacto */}
       <Mapa />
     </>
-  )
+  );
 }
