@@ -34,6 +34,7 @@ export function ShoppingCartDrawer() {
 
   const shipping = subtotal > 0 ? 15 : 0
 
+  // ✅ Redirige al checkout después de cerrar el drawer
   const handleCheckout = () => {
     router.push("/checkout")
   }
@@ -111,7 +112,6 @@ export function ShoppingCartDrawer() {
                     key={item.id}
                     className="group relative flex gap-4 p-4 rounded-lg bg-white border border-[var(--burgundy)]/10 hover:border-[var(--burgundy)]/30 hover:shadow-md transition-all duration-300"
                   >
-                    {/* Image */}
                     <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-[var(--burgundy)]/5">
                       <img
                         src={item.imagen || "/placeholder.svg"}
@@ -120,7 +120,6 @@ export function ShoppingCartDrawer() {
                       />
                     </div>
 
-                    {/* Content */}
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between gap-2">
@@ -147,7 +146,6 @@ export function ShoppingCartDrawer() {
                         <p className="mt-2 text-xl font-bold text-[var(--burgundy-dark)]">${item.precio}</p>
                       </div>
 
-                      {/* Quantity Controls */}
                       <div className="flex items-center gap-3 mt-3">
                         <div className="flex items-center gap-2 bg-[var(--burgundy)]/5 rounded-lg p-1">
                           <Button
@@ -158,7 +156,6 @@ export function ShoppingCartDrawer() {
                             className="h-7 w-7 text-[var(--burgundy)] hover:bg-[var(--burgundy)] hover:text-[var(--cream)] disabled:opacity-30 transition-all"
                           >
                             <Minus className="h-3 w-3" />
-                            <span className="sr-only">Disminuir cantidad</span>
                           </Button>
                           <span className="w-8 text-center font-semibold text-[var(--burgundy-dark)]">
                             {item.cantidad}
@@ -170,7 +167,6 @@ export function ShoppingCartDrawer() {
                             className="h-7 w-7 text-[var(--burgundy)] hover:bg-[var(--burgundy)] hover:text-[var(--cream)] transition-all"
                           >
                             <Plus className="h-3 w-3" />
-                            <span className="sr-only">Aumentar cantidad</span>
                           </Button>
                         </div>
                         <span className="text-sm text-[var(--burgundy)]/60">
@@ -188,7 +184,6 @@ export function ShoppingCartDrawer() {
 
             <Separator className="bg-[var(--burgundy)]/10" />
 
-            {/* Summary */}
             <div className="px-6 py-4 bg-gradient-to-t from-[var(--burgundy)]/5 to-transparent">
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-[var(--burgundy)]/80">
@@ -207,13 +202,17 @@ export function ShoppingCartDrawer() {
               </div>
 
               <DrawerFooter className="px-0 pt-0">
-                <Button
-                  size="lg"
-                  onClick={handleCheckout}
-                  className="w-full bg-[var(--burgundy)] hover:bg-[var(--burgundy-dark)] text-[var(--cream)] font-semibold text-lg h-12 shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  Finalizar Compra
-                </Button>
+                {/* ✅ Cierra el drawer y redirige al checkout */}
+                <DrawerClose asChild>
+                  <Button
+                    size="lg"
+                    onClick={handleCheckout}
+                    className="w-full bg-[var(--burgundy)] hover:bg-[var(--burgundy-dark)] text-[var(--cream)] font-semibold text-lg h-12 shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Finalizar Compra
+                  </Button>
+                </DrawerClose>
+
                 <Button
                   variant="outline"
                   size="lg"

@@ -15,7 +15,7 @@ import { useCart } from "@/contexts/cart-context";
 import { useProductos } from "@/hooks/useProductos";
 import { useProductDetails } from "@/hooks/useProductDetails";
 import { Producto } from "@/types/Producto";
-import { ProductDetail } from "@/types/ProductDetail";
+import { toast } from "sonner"; 
 
 export default function ProductDetailClient() {
   const params = useParams();
@@ -61,7 +61,19 @@ export default function ProductDetailClient() {
         categoria: product.categoryId.toString(),
       });
     }
+
+    // ✅ Mostrar notificación Sonner
+    toast.success(`${product.name} añadido al carrito 🛒`, {
+      duration: 2500,
+      style: {
+        background: "#fff8f8",
+        border: "1px solid var(--burgundy)",
+        color: "var(--burgundy-dark)",
+      },
+    });
   };
+
+  const disponible = product.stockQuantity > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--cream)] to-white">
@@ -135,6 +147,19 @@ export default function ProductDetailClient() {
               </p>
             </div>
 
+            {/* Stock Status */}
+            <div className="flex items-center gap-3">
+              <p
+                className={`text-sm font-medium ${
+                  disponible ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {disponible
+                  ? `Disponible (${product.stockQuantity} en stock)`
+                  : "No disponible"}
+              </p>
+            </div>
+
             {/* Description */}
             <p className="text-gray-700 leading-relaxed">
               {product.description}
@@ -160,6 +185,7 @@ export default function ProductDetailClient() {
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                    disabled={!disponible}
                   >
                     -
                   </button>
@@ -167,8 +193,13 @@ export default function ProductDetailClient() {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() =>
+                      setQuantity(
+                        Math.min(quantity + 1, product.stockQuantity || 1)
+                      )
+                    }
                     className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                    disabled={!disponible}
                   >
                     +
                   </button>
@@ -178,7 +209,12 @@ export default function ProductDetailClient() {
               <div className="flex gap-3">
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-[var(--burgundy)] hover:bg-[var(--burgundy-dark)] text-white py-6 text-lg font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+                  disabled={!disponible}
+                  className={`flex-1 py-6 text-lg font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${
+                    disponible
+                      ? "bg-[var(--burgundy)] hover:bg-[var(--burgundy-dark)] text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
                   Añadir al carrito
