@@ -105,7 +105,7 @@ export default function Header() {
               )}
             </div>
 
-            <Link href="/visitanos">
+            <Link href="https://maps.app.goo.gl/ZhHhj461jnmKvfMM7" target="_blank">
               <Button
                 variant="ghost"
                 className="text-white hover:bg-white/20 transition-all font-medium"

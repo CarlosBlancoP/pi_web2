@@ -24,28 +24,28 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4 pt-2">
               <Link
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=61565888271423&locale=es_LA"
                 target="_blank"
                 className="w-10 h-10 rounded-full bg-gray-800 hover:bg-[#8b2942] flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <FaFacebook size={20} />
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://www.instagram.com/el_arte_de_vivir___"
                 target="_blank"
                 className="w-10 h-10 rounded-full bg-gray-800 hover:bg-[#8b2942] flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <FaInstagram size={20} />
               </Link>
               <Link
-                href="https://twitter.com"
+                href="https://https://x.com/josedavidp36157"
                 target="_blank"
                 className="w-10 h-10 rounded-full bg-gray-800 hover:bg-[#8b2942] flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
                 <FaTwitter size={20} />
               </Link>
               <Link
-                href="https://wa.me/1234567890"
+                href="https://wa.me/573137374800"
                 target="_blank"
                 className="w-10 h-10 rounded-full bg-gray-800 hover:bg-[#8b2942] flex items-center justify-center transition-all duration-300 hover:scale-110"
               >
